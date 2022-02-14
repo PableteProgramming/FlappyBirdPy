@@ -12,7 +12,7 @@ HEIGHT=400
 GRAVITY= 9.8;
 
 class Bird:
-    def __init__(self,x,y,width,height,lives,speed):
+    def __init__(self,x,y,width,height,lives,speed,jumpspeed):
         self.x=x
         self.y=y
         self.width=width
@@ -20,12 +20,19 @@ class Bird:
         self.lives=lives
         self.speed=speed
         self.velocity=0
+        self.jumpspeed= jumpspeed
     
     def move(self,deltatime):
         newy= (self.velocity * deltatime) + (self.speed * GRAVITY * deltatime * deltatime)
         if deltatime !=0:
             self.velocity= newy/deltatime
         self.y= self.y+newy
+    
+        if self.y > HEIGHT-self.height:
+            self.y=HEIGHT-self.height
+        elif self.y < 0:
+            self.y=0
+            self.velocity=0
         
     def draw(self,screen):
         screen.fill((0,0,0))
@@ -35,6 +42,9 @@ class Bird:
     def update(self,deltatime,screen):
         self.move(deltatime)
         self.draw(screen)
+        
+    def jump(self):
+        self.velocity=self.jumpspeed
         
 
 #functions
@@ -51,20 +61,22 @@ def main():
     width=20
     height=20
     speed=80
-    bird= Bird(x,y,width,height,1,speed)
+    jumpspeed=-300
+    bird= Bird(x,y,width,height,1,speed,jumpspeed)
     start= time.time()
     while(not game_over):
         for event in pygame.event.get():
             if event.type== pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type== pygame.KEYDOWN:
+                if event.key== pygame.K_SPACE:
+                    bird.jump()
         now= time.time()
         deltatime= now-start
         start=now
         bird.update(deltatime,screen)
         
-        
-
 
 #core of program    
 if __name__=="__main__":
