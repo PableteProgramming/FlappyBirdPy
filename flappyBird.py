@@ -2,6 +2,7 @@
 import pygame
 import time
 import sys
+import random
 
 #init
 pygame.init()
@@ -60,6 +61,19 @@ class Bird:
         self.velocity=self.jumpspeed
       
       
+def SpawnPipe(speed,height,width,x):
+    direction= random.randint(1,2)
+    up=False
+    if direction==1:
+        up=True
+    y=0
+    if up:
+        y= random.randint(HEIGHT-height+10,HEIGHT-40)
+    else:
+        y= random.randint(-(height)+40,-10)
+    pipes.append(Pipe(x,y,up,speed))
+
+
 class Pipe:
     def __init__(self,x,y,up,speed):
         self.speed=speed
@@ -82,11 +96,11 @@ class Pipe:
             
     
     def move(self,deltatime):
-        self.x-= self.speed* deltatime
+        self.x-= self.speed * deltatime
         if self.x <0:
             #delete this pipe and add another one
             pipes.remove(self)
-            pipes.append(Pipe(WIDTH-self.width,0,True,self.speed))
+            SpawnPipe(self.speed,self.height,self.width,WIDTH-self.width+self.x)
 
 
 def update(screen,deltatime,bird,pipes,background):
@@ -116,8 +130,14 @@ def main():
     jumpspeed=-300
     frame_speed= 0.2
     bird= Bird(x,y,1,speed,jumpspeed,frame_speed)
-    pipes_speed=100
-    pipes.append(Pipe(100,0,True,pipes_speed))
+    pipes_speed=150
+    pipe_template= Pipe(0,0,True,pipes_speed)
+    
+    temp_x=WIDTH-pipe_template.width
+    for i in range(4):
+        SpawnPipe(pipes_speed,pipe_template.height,pipe_template.width,temp_x)
+        temp_x+=150
+    
     background= pygame.image.load("res/img/background.png")
     start= time.time()
     while(not game_over):
